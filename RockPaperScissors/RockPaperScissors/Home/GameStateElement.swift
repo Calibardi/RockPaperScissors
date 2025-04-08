@@ -5,7 +5,7 @@
 //  Created by Lorenzo Ilardi on 08/04/25.
 //
 
-enum GameStateElements {
+enum GameStateElement {
     case rock
     case paper
     case scissors
@@ -30,12 +30,16 @@ enum GameStateElements {
      
      - Returns: `true` if `lhs` wins against `rhs`, `false` otherwise.
      */
-    static func >> (lhs: Self, rhs: Self) -> Bool {
+    static func >> (lhs: Self, rhs: Self) -> Bool? {
         switch (lhs, rhs) {
         case (.rock, .scissors), (.paper, .rock), (.scissors, .paper):
             return true
         default:
-            return false
+            if lhs == rhs {
+                return nil
+            } else {
+                return false
+            }
         }
     }
 }

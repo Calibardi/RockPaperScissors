@@ -8,16 +8,15 @@
 import SwiftUI
 
 struct SquareCustomButton: View {
-    let managedGameElement: GameStateElements
-    @State var isSelected: Bool
+    let managedGameElement: GameStateElement
+    let isSelected: Bool
     let isTappable: Bool
-    let action: () -> Void
+    let action: ((GameStateElement?) -> Void)?
     
     
     var body: some View {
         Button {
-            isSelected.toggle()
-            action()
+            action?(managedGameElement)
         } label: {
             Text(managedGameElement.description)
                 .font(.system(size: 65))
@@ -35,7 +34,7 @@ struct SquareCustomButton: View {
 }
 
 #Preview {
-    SquareCustomButton(managedGameElement: .rock, isSelected: true, isTappable: false) {
+    SquareCustomButton(managedGameElement: .rock, isSelected: true, isTappable: false) { _ in
         print("tapped")
     }
 }
