@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeGameView: View {
-    @State private var playerName: String = ""
+    @State private var playerName: String = "Lorenzo"
     @State private var gameState: ViewState = .playing
     @State private var playerWonRound: Bool = false
     @State private var playerWonMatch: Bool = false
@@ -42,7 +42,6 @@ struct HomeGameView: View {
         playerChoice = choice
         botChoice = gameElementsArray.randomElement()!
         calculateWinner()
-        calculateScore()
     }
     
     private func calculateWinner() {
@@ -108,15 +107,19 @@ private extension HomeGameView {
     }
     
     var playingStateScreen: some View {
-        VStack(spacing: 50) {
+        VStack() {
             HStack {
                 Text("🤖")
+                    .font(.system(size: 40))
                 Spacer()
                 Text("Score: \(botScore)")
+                    .font(.system(size: 30))
+
             }
             
             Spacer()
-            VStack(spacing: 100) {
+            
+            VStack(spacing: 60) {
                 HStack(spacing: 20) {
                     ForEach(gameElementsArray, id: \.self) { gameElement in
                         SquareCustomButton(
@@ -151,13 +154,18 @@ private extension HomeGameView {
             
             HStack {
                 Text(playerName)
+                    .font(.system(size: 40))
                 Spacer()
                 Text("Score: \(playerScore)")
+                    .font(.system(size: 30))
+
             }
             
             Text("Round 1/10")
         }
         .padding(.horizontal, 20)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.blue.opacity(0.3))
     }
 }
 
