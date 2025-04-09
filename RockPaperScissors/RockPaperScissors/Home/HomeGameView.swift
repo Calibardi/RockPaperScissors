@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeGameView: View {
-    @State private var gameState: ViewState = .playing
+    @State private var gameState: ViewState = .starting
     @State private var playerName: String = ""
     @State private var playerWonRound: Bool = false
     @State private var botChoice: GameStateElement?
