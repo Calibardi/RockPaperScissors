@@ -11,15 +11,25 @@ struct HomeGameView: View {
     @State private var playerName: String = "Lorenzo"
     @State private var gameState: ViewState = .playing
     @State private var playerWonRound: Bool = false
-    @State private var playerWonMatch: Bool = false
     @State private var botChoice: GameStateElement?
     @State private var playerChoice: GameStateElement?
     @State private var botScore: Int = 0
     @State private var playerScore: Int = 0
-    
+    @State private var roundNumber: Int = 1
     @State private var shouldShowAlert: Bool = false
-    
+
+    private let maxNumberOfRounds: Int = 10
     private let gameElementsArray: [GameStateElement] = [.rock, .paper, .scissors]
+    
+    private var alertDescription: String {
+        if playerScore < botScore {
+            return "Bot Won 😳"
+        } else if playerScore > botScore {
+            return "You Won! ✌️"
+        } else {
+            return "It's a tie!"
+        }
+    }
     
     var body: some View {
         switch gameState {
@@ -27,11 +37,11 @@ struct HomeGameView: View {
             startingStateScreen
         case .playing:
             playingStateScreen
-//                .alert(
-//                    playerWonRound ? "You scored!": "Bot scored",
-//                    isPresented: $shouldShowAlert) {
-//                        Button("Next round", action: goToNextRound)
-//                    }
+                .alert(
+                    alertDescription,
+                    isPresented: $shouldShowAlert) {
+                        Button("Restart", action: restartGame)
+                    }
         default:
             Text(playerName + " playing")
         }
@@ -42,6 +52,7 @@ struct HomeGameView: View {
         playerChoice = choice
         botChoice = gameElementsArray.randomElement()!
         calculateWinner()
+        goToNextRound()
     }
     
     private func calculateWinner() {
@@ -65,10 +76,22 @@ struct HomeGameView: View {
         }
     }
     
-//    private func goToNextRound() {
-//        playerChoice = nil
-//        botChoice = nil
-//    }
+    private func goToNextRound() {
+        if roundNumber + 1 <= maxNumberOfRounds {
+            roundNumber += 1
+        } else {
+            shouldShowAlert = true
+        }
+    }
+    
+    private func restartGame() {
+        playerScore = 0
+        botScore = 0
+        botChoice = nil
+        playerChoice = nil
+        roundNumber = 1
+        playerWonRound = false
+    }
 }
 
 //MARK: - UI components extension
@@ -114,7 +137,7 @@ private extension HomeGameView {
                 Spacer()
                 Text("Score: \(botScore)")
                     .font(.system(size: 30))
-
+                
             }
             
             Spacer()
@@ -158,10 +181,10 @@ private extension HomeGameView {
                 Spacer()
                 Text("Score: \(playerScore)")
                     .font(.system(size: 30))
-
+                
             }
             
-            Text("Round 1/10")
+            Text("Round \(roundNumber)/\(maxNumberOfRounds)")
         }
         .padding(.horizontal, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
