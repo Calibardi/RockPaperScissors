@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeGameView: View {
-    @State private var gameState: ViewState = .starting
+    @State private var gameState: ViewState = .playing
     @State private var playerName: String = ""
     @State private var playerWonRound: Bool = false
     @State private var botChoice: GameStateElement?
@@ -233,8 +233,8 @@ private extension HomeGameView {
                 }
             }
         }
-        .frame(maxWidth: .infinity)
         .font(.system(size: 30, weight: .thin, design: .monospaced))
+        .padding(.horizontal, 10)
     }
     
     private var backgroundGradient: some View {
