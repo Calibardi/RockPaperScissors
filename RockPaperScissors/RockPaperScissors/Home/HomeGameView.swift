@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct HomeGameView: View {
-    @State private var playerName: String = "Lorenzo"
-    @State private var gameState: ViewState = .playing
+    @State private var gameState: ViewState = .starting
+    @State private var playerName: String = ""
     @State private var playerWonRound: Bool = false
     @State private var botChoice: GameStateElement?
     @State private var playerChoice: GameStateElement?
@@ -17,7 +17,7 @@ struct HomeGameView: View {
     @State private var playerScore: Int = 0
     @State private var roundNumber: Int = 1
     @State private var shouldShowAlert: Bool = false
-
+    
     private let maxNumberOfRounds: Int = 10
     private let gameElementsArray: [GameStateElement] = [.rock, .paper, .scissors]
     
@@ -97,98 +97,153 @@ struct HomeGameView: View {
 //MARK: - UI components extension
 private extension HomeGameView {
     var startingStateScreen: some View {
-        VStack(alignment: .center, spacing: 50) {
-            VStack {
-                Text("Rock")
-                Text("Paper")
-                Text("Scissors")
-            }
-            .font(.largeTitle)
+        ZStack {
+            backgroundGradient
             
-            VStack {
-                Text("What's your name?")
-                TextField("Enter your name...", text: $playerName)
-                    .frame(width: 200, height: 50)
-                    .background(.thinMaterial)
-                    .multilineTextAlignment(.center)
-                    .clipShape(.rect(cornerRadius: 10))
+            VStack(alignment: .center, spacing: 200) {
+                VStack(spacing: 100) {
+                    HStack {
+                        Rectangle()
+                            .frame(width: 1)
+                        VStack(alignment: .leading) {
+                            Text("Rock")
+                            Text("Paper")
+                            Text("Scissors")
+                        }
+                        .font(.largeTitle)
+                    }
+                    .frame(width: 300, height: 110)
+                    .foregroundStyle(.primary)
+                    
+                    
+                    VStack {
+                        Text("What's your name?")
+                            .font(.system(size: 20, weight: .semibold, design: .monospaced))
+                        TextField("Enter your name...", text: $playerName)
+                            .frame(width: 200, height: 50)
+                            .background(.thinMaterial)
+                            .multilineTextAlignment(.center)
+                            .clipShape(.rect(cornerRadius: 10))
+                            .shadow(radius: 5, x: 5, y: 5)
+                    }
+                }
+                
+                Button {
+                    gameState = .playing
+                } label: {
+                    Text("Play")
+                    Image(systemName: "restart")
+                }
+                .disabled(playerName.isEmpty)
+                .frame(width: 100, height: 50)
+                .background(.thinMaterial)
+                .clipShape(.rect(cornerRadius: 10))
+                .shadow(radius: 5, x: 3, y: 3)
+                .foregroundStyle(.primary)
+                .font(.system(size: 17, weight: .semibold, design: .monospaced))
             }
-            
-            Button {
-                gameState = .playing
-            } label: {
-                Text("Play")
-                Image(systemName: "restart")
-            }
-            .disabled(playerName.isEmpty)
-            .frame(width: 100, height: 50)
-            .background(.thinMaterial)
-            .multilineTextAlignment(.center)
-            .clipShape(.rect(cornerRadius: 10))
+            .padding(.vertical, 20)
         }
-        .padding(.vertical, 20)
     }
     
     var playingStateScreen: some View {
-        VStack() {
-            HStack {
-                Text("🤖")
-                    .font(.system(size: 40))
-                Spacer()
-                Text("Score: \(botScore)")
-                    .font(.system(size: 30))
-                
-            }
-            
-            Spacer()
-            
-            VStack(spacing: 60) {
-                HStack(spacing: 20) {
-                    ForEach(gameElementsArray, id: \.self) { gameElement in
-                        SquareCustomButton(
-                            managedGameElement: gameElement,
-                            isSelected: gameElement == botChoice,
-                            isTappable: false,
-                            action: nil)
-                    }
-                }
-                
+        ZStack {
+            backgroundGradient
+            VStack() {
                 HStack {
-                    Text(playerChoice?.description ?? "Your move")
-                    Text("/")
-                        .font(.system(size: 20))
-                    Text(botChoice?.description ?? "Its move")
-                }.font(.system(size: 30))
+                    Text("🤖")
+                        .font(.system(size: 60))
+                    Spacer()
+                    Text("\(botScore)")
+                        .font(.system(size: 30, weight: .semibold, design: .monospaced))
+                }
                 
-                HStack(spacing: 20) {
-                    ForEach(gameElementsArray, id: \.self) { gameElement in
-                        SquareCustomButton(
-                            managedGameElement: gameElement,
-                            isSelected: gameElement == playerChoice,
-                            isTappable: true) { userChoice in
-                                guard let userChoice else { return }
-                                userDidChoose(userChoice)
-                            }
+                Spacer()
+                
+                VStack(spacing: 60) {
+                    HStack(spacing: 20) {
+                        ForEach(gameElementsArray, id: \.self) { gameElement in
+                            SquareCustomButton(
+                                managedGameElement: gameElement,
+                                isSelected: gameElement == botChoice,
+                                isTappable: false,
+                                action: nil)
+                            .shadow(radius: 5, x: 0, y: -5)
+                        }
+                    }
+                    
+                    Divider()
+                        .background(.primary)
+                    
+                    centerBoardView
+                    
+                    Divider()
+                        .background(.primary)
+                    
+                    HStack(spacing: 20) {
+                        ForEach(gameElementsArray, id: \.self) { gameElement in
+                            SquareCustomButton(
+                                managedGameElement: gameElement,
+                                isSelected: gameElement == playerChoice,
+                                isTappable: true) { userChoice in
+                                    guard let userChoice else { return }
+                                    userDidChoose(userChoice)
+                                }
+                                .shadow(radius: 5, x: 0, y: 5)
+                        }
                     }
                 }
-            }
-            
-            Spacer()
-            
-            HStack {
-                Text(playerName)
-                    .font(.system(size: 40))
-                Spacer()
-                Text("Score: \(playerScore)")
-                    .font(.system(size: 30))
                 
+                Spacer()
+                
+                VStack(spacing: 10) {
+                    HStack {
+                        Text(playerName)
+                            .font(.system(size: 40, weight: .semibold, design: .monospaced))
+                        Spacer()
+                        Text("\(playerScore)")
+                            .font(.system(size: 30, weight: .semibold, design: .monospaced))
+                    }
+                    
+                    Text("Round \(roundNumber)/\(maxNumberOfRounds)")
+                        .font(.system(size: 20, weight: .thin, design: .monospaced))
+                }
             }
-            
-            Text("Round \(roundNumber)/\(maxNumberOfRounds)")
+            .padding(.horizontal, 20)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .padding(.horizontal, 20)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.blue.opacity(0.3))
+    }
+    
+    private var centerBoardView: some View {
+        HStack {
+            HStack {
+                if playerChoice != nil {
+                    Text("You")
+                    Spacer()
+                }
+                Text(playerChoice?.description ?? "Your move")
+            }
+            Text("/")
+                .font(.system(size: 20, weight: .semibold))
+            HStack {
+                Text(botChoice?.description ?? "Its move")
+                if botChoice != nil {
+                    Spacer()
+                    Text("Bot")
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .font(.system(size: 30, weight: .thin, design: .monospaced))
+    }
+    
+    private var backgroundGradient: some View {
+        RadialGradient(
+            gradient: Gradient(colors: [Color.green.opacity(0.5), Color.mint]),
+            center: .center,
+            startRadius: 20,
+            endRadius: 400
+        ).ignoresSafeArea(.all)
     }
 }
 
